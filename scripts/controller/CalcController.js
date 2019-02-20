@@ -8,6 +8,7 @@ class CalcController{
         this._dateCalcEl = document.querySelector("#data");
         this._timeCalcEl = document.querySelector("#hora");
         this.initialize();
+        this.initButtonsEvent();
 
 
     }
@@ -23,6 +24,20 @@ class CalcController{
 
     initButtonsEvent(){
         let buttons = document.querySelectorAll("#buttons > g, #parts > g");
+        
+        /* para cada botão do array buttons será executado a arrow function
+            com parâmetro btn representando cada elemento do array.
+        */
+        buttons.forEach( btn => {
+            
+            /* adicionando um evento de click para cada btn onde será executado
+                uma arrow function indicando o que deve ser feito quando o botão for 
+                clicado. 'ev' é o para parâmetro da function.
+            */
+            btn.addEventListener('click', ev => {
+                console.log(btn);
+            });
+        });
     }
 
     setDisplayDateTime(){
