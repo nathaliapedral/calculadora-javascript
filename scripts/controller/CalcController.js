@@ -71,7 +71,9 @@ class CalcController{
                 this.addOperation('%');
                 break;
             case 'igual':
-                //todo
+                this.calc(this._operations);
+                this.updateDisplay(this.calc(this._operations));
+                console.log(this._operations);
                 break;
             case 'ponto':
                 this.addOperation('.');
@@ -98,13 +100,21 @@ class CalcController{
     clearAll(){
         this._operations = [0];
         console.log(this._operations);
+        this.updateDisplay(0);
     }
 
     clearEntry(){
-        this._operations.pop();
+
+        if (this.isOperator(this.getLastOperation())){
+          this._operations.push(0);
+        } else {
+            this.setLastOperation(0);   
+        }
+        this.updateDisplay(0);
         console.log(this._operations);
 
     }
+
 
     getLastOperation(){
         return this._operations[this._operations.length -1];
@@ -120,27 +130,62 @@ class CalcController{
         this._operations[this._operations.length-1] = value;
     }
 
+    pushOperation(value){
+
+        this._operations.push(value);
+
+        if (this._operations.length > 3){
+            let last = this._operations.pop();
+            if (last === '%'){
+                this._operations = [this.calc(this._operations)/100];
+            } else {
+                this._operations = [this.calc(this._operations)];
+                this._operations.push(last);
+
+            }
+            this.updateDisplay(this._operations[0]);
+        }
+        
+    }
+
+    updateDisplay(value){
+
+        this.displayCalc = value;
+
+    }
+
+    calc(arr){
+        let result = '';
+        arr.forEach( el => {
+            result += el.toString();
+        });
+        return eval(result);
+    }
+
     addOperation(value){
     
         if(isNaN(this.getLastOperation())) {
             if (this.isOperator(value)){
                 this.setLastOperation(value);
             } else {
-                this._operations.push(value);
+                this.pushOperation(value);
+                this.updateDisplay(value);
             }      
         } else if (isNaN(value)){
-            this._operations.push(value);
+            this.pushOperation(value);
         } else if(this.getLastOperation() === 0){
             this.setLastOperation(value);
+            this.updateDisplay(value);
         } else{
             let newValue = this.getLastOperation().toString() + value.toString();
             this.setLastOperation(parseInt(newValue));
+            this.updateDisplay(parseInt(newValue));
         }
 
-    console.log(this._operations); 
+        console.log(this._operations); 
     }
-             
-
+      
+    
     /* Adiciona um listener ao elemento (element) para cada evento passado por 
         parâmetro(events) */
     addEventListenerAll (element, events, func){
