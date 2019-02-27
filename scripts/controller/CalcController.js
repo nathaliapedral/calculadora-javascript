@@ -13,8 +13,6 @@ class CalcController{
         this.initialize();
         this.initButtonsEvent();
         this.initKeyboard();
-
-
     }
 
     initialize(){
@@ -97,6 +95,9 @@ class CalcController{
             case '.':
                 this.addDot('.');
                 break;
+            case 'Shift':
+                //ignorar
+                break;
             
             case '0':
             case '1':
@@ -111,21 +112,27 @@ class CalcController{
                 this.addOperation(parseInt(value));
                 break;
             default:
-                this.displayCalc = 'Error';
+                this.setError();
         }
 
     }
 
+    setError(){
+        this.displayCalc = 'Error';
+        this._operations = [0];
+        setTimeout(()=>{
+            this.displayCalc = '0';
+        },1000);
+    }
+
     execEqual(){
         this.pushOperation('=');
-        console.log(this._operations);
     }
 
     clearAll(){
         this._operations = [0];
         this._lastNumber = '';
         this._lastOperator = '';
-        console.log(this._operations);
         this.updateDisplay(0);
     }
 
@@ -137,7 +144,6 @@ class CalcController{
             this.setLastOperation(0);   
         }
         this.updateDisplay(0);
-        console.log(this._operations);
 
     }
 
@@ -151,7 +157,7 @@ class CalcController{
             this._operations.push('0.');
         } else if (typeof lastOperation === 'number' && lastOperation !== 0){
             this.setLastOperation(lastOperation.toString()+'.');    
-        } else if (typeof lastOperation === 'string'){
+        } else if (typeof lastOperation === 'string' && lastOperation !== '='){
             this.setLastOperation(lastOperation+'.');
         } 
         else {
@@ -198,7 +204,6 @@ class CalcController{
                 this._operations = [this.calc([this.getLastItem(false),this.getLastOperation(),this.getLastItem(false)])];
                 this._operations.push(last);
             } else if (this.getLastOperation()==='='){
-                //console.log('Ultimo item', this.getLastItem(false));
                 this._operations = [this.calc([this.getLastItem(false),this._lastOperator,this._lastNumber])];
                 this._operations.push(last);
             }
@@ -245,7 +250,15 @@ class CalcController{
             result += el.toString();
         });
         console.log(result)
-        return Math.round(eval(result)*100000000)/100000000;
+        try{
+            return Math.round(eval(result)*100000000)/100000000;
+
+        } catch(e){
+            console.log(e);
+            setTimeout(()=>{
+                this.setError();
+            },1);
+        }
     }
 
     addOperation(value){
